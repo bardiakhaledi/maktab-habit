@@ -43,6 +43,8 @@ class Store {
   onSaveError: ((reason: 'quota' | 'unavailable') => void) | null = null;
   /** Signed-in account (name and phone are shown in Settings). */
   user: User | null = null;
+  /** False on a static host (GitHub Pages): no accounts, sync or reminders. */
+  serverMode = true;
   /** Called after every user change is saved locally (used to sync to the server). */
   onPersist: (() => void) | null = null;
   recoveredFromCorruption = false;

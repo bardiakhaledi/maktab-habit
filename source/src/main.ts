@@ -42,16 +42,52 @@ function start(user: User, el: HTMLElement): void {
 
 watchInstallPrompt(() => store.setUi({}));
 
+const SERVER_KEY = 'maktab.server.v1';
+
+/**
+ * Is the app served by its own server (accounts, sync, reminders)?
+ * On a static host such as GitHub Pages there is no /api, and the app runs in
+ * local mode: no sign-in, data stays on this phone (the original behaviour).
+ * Once a server answered, that is remembered so offline launches still show sign-in.
+ */
+async function hasServer(): Promise<boolean> {
+  if (location.hostname.endsWith('github.io')) return false;
+  try {
+    if (localStorage.getItem(SERVER_KEY) === '1') return true;
+  } catch {
+    /* ignore */
+  }
+  try {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 5000);
+    const res = await fetch('./api/push/key', { signal: controller.signal, headers: { Accept: 'application/json' } });
+    window.clearTimeout(timer);
+    const body = (await res.json().catch(() => null)) as { publicKey?: unknown } | null;
+    const ok = res.ok && typeof body?.publicKey === 'string';
+    if (ok) localStorage.setItem(SERVER_KEY, '1');
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 const user = loadAuth();
 if (user) {
   start(user, root);
 } else {
-  mountAuth(root, (u) => {
-    adoptAccount(u);
-    // Fresh node for the app, so the sign-in screen's listeners go away with the old one.
-    const fresh = root.cloneNode(false) as HTMLElement;
-    root.replaceWith(fresh);
-    start(u, fresh);
+  void hasServer().then((server) => {
+    store.serverMode = server;
+    if (!server) {
+      mountApp(root); // local mode
+      return;
+    }
+    mountAuth(root, (u) => {
+      adoptAccount(u);
+      // Fresh node for the app, so the sign-in screen's listeners go away with the old one.
+      const fresh = root.cloneNode(false) as HTMLElement;
+      root.replaceWith(fresh);
+      start(u, fresh);
+    });
   });
 }
 

@@ -81,7 +81,11 @@ export function renderSettings(): string {
 
       <section class="panel" aria-labelledby="reminder-title">
         <div class="panel__head"><div><div class="label">REMINDER</div><h2 class="panel__title" id="reminder-title">یادآوری شبانه</h2></div></div>
-        <div class="panel__body">${reminderBody(reminderState())}</div>
+        <div class="panel__body">${
+          store.serverMode
+            ? reminderBody(reminderState())
+            : '<p class="small muted" style="margin:0">به‌زودی: یادآوری هر شب ساعت <span class="num">21:30</span> با نام کارهای ناتمام، همراه با حساب کاربری و ذخیره‌ی داده روی سرور.</p>'
+        }</div>
       </section>
 
       ${installSection()}
@@ -106,7 +110,11 @@ export function renderSettings(): string {
       <section class="panel" aria-labelledby="backup-title">
         <div class="panel__head"><h2 class="panel__title" id="backup-title">پشتیبان‌گیری</h2></div>
         <div class="panel__body">
-          <p class="small muted" style="margin:0 0 14px">داده‌هایت روی حساب تو ذخیره می‌شود و با ورود روی هر گوشی برمی‌گردد. برای اطمینان بیشتر می‌توانی یک فایل پشتیبان هم نگه داری.</p>
+          <p class="small muted" style="margin:0 0 14px">${
+            store.user
+              ? 'داده‌هایت روی حساب تو ذخیره می‌شود و با ورود روی هر گوشی برمی‌گردد. برای اطمینان بیشتر می‌توانی یک فایل پشتیبان هم نگه داری.'
+              : 'داده‌هایت فقط روی همین گوشی ذخیره می‌شود. پیش از تعویض گوشی یا پاک کردن داده‌های مرورگر، فایل پشتیبان بگیر.'
+          }</p>
           <div class="btn-row">
             <button class="btn btn--ghost" data-action="export-backup">${btnIcon(icons.download)} دریافت فایل</button>
             <button class="btn btn--ghost" data-action="import-backup">${btnIcon(icons.upload)} بازیابی</button>

@@ -1,0 +1,20 @@
+{
+  "name": "مکتب — ردیاب عادت",
+  "short_name": "مکتب",
+  "description": "ثبت روزانه‌ی عادت‌ها، آب‌سنج، ژورنال و نمودار پیشرفت.",
+  "lang": "fa",
+  "dir": "rtl",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E0A09",
+  "theme_color": "#0E0A09",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
