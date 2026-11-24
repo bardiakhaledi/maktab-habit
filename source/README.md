@@ -3,7 +3,31 @@
 PWA با سرور Node: ورود با شماره همراه و رمز، ذخیره‌ی داده‌ی هر کاربر روی سرور (و یک نسخه‌ی آفلاین در `localStorage`)،
 یادآوری شبانه‌ی ساعت ۲۱:۳۰ (Web Push) با نام کارهای ناتمام، و صفحه‌ی مدیریت کاربران در `/admin`.
 
-## راه‌اندازی روی سرور
+## انتشار روی Cloudflare (رایگان) — نسخه‌ی فعلی
+
+اپ روی **https://habit.maktabagency.ir** با Cloudflare Workers + D1 اجرا می‌شود (پلن رایگان):
+- `worker/index.js` همان API سرور Node را روی Workers اجرا می‌کند؛ `worker/webpush.js` ارسال اعلان بدون کتابخانه‌ی Node.
+- دیتابیس: D1 به نام `maktab-habit` (جدول‌ها در `migrations/`).
+- یادآوری: Cron هر ۱۵ دقیقه؛ هر کاربر ساعت `REMINDER_TIME` (۲۱:۳۰) به وقت خودش اعلان می‌گیرد.
+- پنل کاربران: https://habit.maktabagency.ir/admin — نام کاربری `admin`، رمز در secret به نام `ADMIN_PASSWORD`.
+
+انتشار نسخه‌ی تازه (بعد از `npx wrangler login`):
+
+```bash
+npm ci
+npm run deploy
+```
+
+secretها (فقط یک بار؛ تغییر `VAPID_PRIVATE_KEY` اشتراک اعلان همه‌ی کاربران را باطل می‌کند):
+
+```bash
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put VAPID_PRIVATE_KEY
+```
+
+دیدن کاربران از خط فرمان: `npx wrangler d1 execute maktab-habit --remote --command "SELECT name, phone, created_at FROM users"`
+
+## راه‌اندازی روی سرور Node (جایگزین)
 
 نیاز: Node.js نسخه‌ی 22.13 یا بالاتر (از `node:sqlite` داخلی استفاده می‌شود) و دامنه با **HTTPS** (برای نصب PWA و اعلان الزامی است).
 

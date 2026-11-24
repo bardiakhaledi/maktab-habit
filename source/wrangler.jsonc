@@ -1,0 +1,28 @@
+// Cloudflare deployment of the habit tracker: static app (dist/) + API Worker + D1 + nightly cron.
+// Deploy: npm run build && npx wrangler d1 migrations apply maktab-habit --remote && npx wrangler deploy
+// Secrets (once): npx wrangler secret put ADMIN_PASSWORD · npx wrangler secret put VAPID_PRIVATE_KEY
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "maktab-habit",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "routes": [{ "pattern": "habit.maktabagency.ir", "custom_domain": true }],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/admin", "/admin/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "maktab-habit", "database_id": "ecd67f53-6776-4366-8f21-ffe620d024cb", "migrations_dir": "migrations" }
+  ],
+  // Every 15 minutes; each user gets the reminder at REMINDER_TIME in their own time zone.
+  "triggers": { "crons": ["*/15 * * * *"] },
+  "vars": {
+    "REMINDER_TIME": "21:30",
+    "VAPID_SUBJECT": "https://habit.maktabagency.ir",
+    "VAPID_PUBLIC_KEY": "BEaOQuV9ZVMjUfJf3DaLx_z3KCxvRGj9ZXU7DPGDb5OgiRNTEnHbc68IsYa38Z-flRwX0fTx9CXl4_S5ih_8asw"
+  },
+  "observability": { "enabled": true }
+}

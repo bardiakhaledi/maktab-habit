@@ -7,3 +7,5 @@ data-dev/
 *.db-shm
 vapid.json
 .env
+.wrangler/
+.dev.vars
